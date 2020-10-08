@@ -83,6 +83,20 @@ var _ = Describe("application", func() {
 			Expect(instance).NotTo(BeNil())
 		})
 
+		It("should return success if only watches is used", func() {
+			By("creating a controller manager")
+			m, err := manager.New(cfg, manager.Options{})
+			Expect(err).NotTo(HaveOccurred())
+
+			instance, err := ControllerManagedBy(m).
+				Watches( // Equivalent of Owns
+					&source.Kind{Type: &appsv1.ReplicaSet{}},
+					&handler.EnqueueRequestForOwner{OwnerType: &appsv1.Deployment{}, IsController: true}).
+				Build(noop)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(instance).NotTo(BeNil())
+		})
+
 		It("should return error if given two apiType objects in For function", func() {
 			By("creating a controller manager")
 			m, err := manager.New(cfg, manager.Options{})
